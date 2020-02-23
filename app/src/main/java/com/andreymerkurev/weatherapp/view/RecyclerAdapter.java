@@ -1,12 +1,15 @@
 package com.andreymerkurev.weatherapp.view;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import javax.inject.Inject;
 import com.andreymerkurev.weatherapp.R;
@@ -16,9 +19,6 @@ import com.andreymerkurev.weatherapp.presenter.IRecyclerSelectCityPresenter;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.InnerViewHolder>{
     private IRecyclerSelectCityPresenter iRecyclerSelectCityPresenter;
-
-    @Inject
-    PicassoLoader picassoLoader; //TODO not use
 
     RecyclerAdapter(IRecyclerSelectCityPresenter iRecyclerSelectCityPresenter) {
         App.getAppComponent().inject(this);
@@ -44,9 +44,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.InnerV
     }
 
     class InnerViewHolder extends RecyclerView.ViewHolder implements IViewHolder {
-        private ImageView imageView;
         private TextView tvName;
         private TextView tvCountry;
+        private CardView cardView;
 //        private TextView tvTemp;
         private int position = 0;
 
@@ -55,19 +55,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.InnerV
 //            imageView = itemView.findViewById(R.id.iv);
             tvName = itemView.findViewById(R.id.card_item_name);
             tvCountry = itemView.findViewById(R.id.card_item_country);
-
-//                imageView.setOnClickListener(view1 -> {
-//                    iRecyclerSelectCityPresenter.onClick(view1, position);
-//                });
+            cardView = itemView.findViewById(R.id.card_view);
+            cardView.setOnClickListener(v ->
+                    iRecyclerSelectCityPresenter.onClick(v, position)
+            );
             }
-
-//        @Override
-//        public void setWeather(String name, ) {
-//
-////            picassoLoader.loadImage(url, imageView);
-//
-//
-//        }
 
         @Override
         public int getPos() {

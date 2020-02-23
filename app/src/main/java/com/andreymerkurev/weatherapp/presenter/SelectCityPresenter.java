@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.andreymerkurev.weatherapp.app.App;
 import com.andreymerkurev.weatherapp.model.entity.City;
-import com.andreymerkurev.weatherapp.model.entity.RequestResult;
+import com.andreymerkurev.weatherapp.model.entity.RequestResultSearch;
 import com.andreymerkurev.weatherapp.model.retrofit.ApiHelper;
 import com.andreymerkurev.weatherapp.view.ISelectCityView;
 import com.andreymerkurev.weatherapp.view.IViewHolder;
@@ -22,7 +22,7 @@ import moxy.MvpPresenter;
 
 @InjectViewState
 public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
-    private static final String TAG = "app_log - MainPresenter";
+    private static final String TAG = "app_log - SelectCityPre";
     private RecyclerSelectCityPresenter recyclerSelectCityPresenter;
     private List<City> resultCities;
 
@@ -38,31 +38,10 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
         return recyclerSelectCityPresenter;
     }
 
-    public void getAllCitiesFromInternet() {
-//        getViewState().progressBarSetVisibility(View.VISIBLE);
-        Log.d(TAG, "entry pres");
-        Observable<List<City>> single = apiHelper.requestServer();
-        Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
-            Log.d(TAG, "onNext: " + cities);
-//            for (Hit hit : photos.hits) {
-//                putData(hit.webformatURL);
-//            }
-            resultCities = cities;
-//            getViewState().progressBarSetVisibility(View.INVISIBLE);
-            getViewState().updateRecyclerView();
-        }, throwable -> {
-            Log.e(TAG, "onError " + throwable);
-        });
-    }
-
-    public void getAllCitiesFromInternet2() {
+    public void getAllCitiesFromInternet(String cityName) {
         getViewState().progressBarSetVisibility(View.VISIBLE);
-        Observable<RequestResult> single = apiHelper.requestServer2();
+        Observable<RequestResultSearch> single = apiHelper.requestServer(cityName);
         Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
-//            Log.d(TAG, "onNext1: " + cities);
-//            Log.d(TAG, "onNext2: " + cities.searchApi);
-//            Log.d(TAG, "onNext3 size: " + cities.searchApi.result.size());
-//            Log.d(TAG, "onNext4: " + cities.searchApi.result.get(0).country);
 
             for (City city : cities.searchApi.result) {
 //                putData(hit.webformatURL);
@@ -73,10 +52,34 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
             resultCities = cities.searchApi.result;
             getViewState().progressBarSetVisibility(View.INVISIBLE);
             getViewState().updateRecyclerView();
-        }, throwable -> {
+        }, throwable -> { //TODO нужен пустой лист
+            getViewState().progressBarSetVisibility(View.INVISIBLE);
             Log.e(TAG, "onError " + throwable);
         });
     }
+
+//    public void getAllCitiesFromInternet2() {
+//        getViewState().progressBarSetVisibility(View.VISIBLE);
+//        Observable<RequestResultSearch> single = apiHelper.requestServer2();
+//        Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
+////            Log.d(TAG, "onNext1: " + cities);
+////            Log.d(TAG, "onNext2: " + cities.searchApi);
+////            Log.d(TAG, "onNext3 size: " + cities.searchApi.result.size());
+////            Log.d(TAG, "onNext4: " + cities.searchApi.result.get(0).country);
+//
+//            for (City city : cities.searchApi.result) {
+////                putData(hit.webformatURL);
+//                Log.d(TAG, "onNext: city.areaName: " + city.areaName.get(0).value +
+//                        " --- city.country:" + city.country.get(0).value +
+//                        " lat: " + city.latitude + " lon: " + city.longitude);
+//            }
+//            resultCities = cities.searchApi.result;
+//            getViewState().progressBarSetVisibility(View.INVISIBLE);
+//            getViewState().updateRecyclerView();
+//        }, throwable -> {
+//            Log.e(TAG, "onError " + throwable);
+//        });
+//    }
 
 
     private class RecyclerSelectCityPresenter implements IRecyclerSelectCityPresenter {
@@ -98,7 +101,7 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
 
         @Override
         public void onClick(View v, int position) {
-//            getViewState().onClick(v, position, resultCities);
+            getViewState().onClick(v, resultCities.get(position).areaName.get(0).value);
         }
     }
 

@@ -20,8 +20,6 @@
             android:layout_marginStart="@dimen/card_item_margin_start"
             android:adjustViewBounds="true"
             android:lines="1"
-
-
             />
 
         <TextView
@@ -34,7 +32,6 @@
             android:layout_marginStart="@dimen/card_item_margin_start"
             android:adjustViewBounds="true"
             android:lines="1"
-
             />
 
         <TextView
@@ -45,10 +42,8 @@
             android:layout_alignParentTop="true"
             android:textSize="14sp"
             android:layout_marginEnd="@dimen/card_item_margin_end"
-            android:text="+5"
             android:adjustViewBounds="true"
             android:lines="1"
-
             />
 
 

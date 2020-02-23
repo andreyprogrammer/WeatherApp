@@ -14,9 +14,7 @@
         android:id="@+id/pb_select_city"
         style="?android:attr/progressBarStyleHorizontal"
         android:indeterminate="true"
-        android:visibility="invisible"
-        >
-
+        android:visibility="invisible">
     </ProgressBar>
 
     <EditText

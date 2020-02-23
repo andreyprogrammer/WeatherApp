@@ -1,8 +1,11 @@
 package com.andreymerkurev.weatherapp.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import androidx.appcompat.widget.Toolbar;
@@ -18,10 +21,11 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
 public class SelectCityActivity extends MvpAppCompatActivity implements ISelectCityView {
-    private static final String TAG = "app_log - MainActivity";
+    private static final String TAG = "app_log - WeatherActivity";
     private Button btn;
     private RecyclerAdapter adapter;
     private ProgressBar progressBar;
+    private EditText editText;
 
     @InjectPresenter
     SelectCityPresenter selectCityPresenter;
@@ -36,20 +40,20 @@ public class SelectCityActivity extends MvpAppCompatActivity implements ISelectC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_city);
         App.getAppComponent().inject(this);
-        initRecyclerView();
         progressBar = findViewById(R.id.pb_select_city);
-        btn = findViewById(R.id.btn);
-        btn.setOnClickListener(v -> {
-            Log.d(TAG, "entry act");
-//            selectCityPresenter.getAllCitiesFromInternet();
-            selectCityPresenter.getAllCitiesFromInternet2();
-
-        });
+        editText = findViewById(R.id.et_select_city);
         Toolbar toolbar = findViewById(R.id.toolbar_select_activity);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        initRecyclerView();
+        btn = findViewById(R.id.btn);
+        btn.setOnClickListener(v -> {
+//            Log.d(TAG, "entry act");
+//            selectCityPresenter.getAllCitiesFromInternet(); //TODO проверка на пустое поле
+            selectCityPresenter.getAllCitiesFromInternet(editText.getText().toString());
+
+        });
 
 
     }
@@ -71,6 +75,13 @@ public class SelectCityActivity extends MvpAppCompatActivity implements ISelectC
     @Override
     public void updateRecyclerView() {
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClick(View v, String cityName) {
+        Intent intent = new Intent(v.getContext(), WeatherActivity.class);
+        intent.putExtra("CITY_NAME", cityName);
+        startActivity(intent);
     }
 
     @Override
