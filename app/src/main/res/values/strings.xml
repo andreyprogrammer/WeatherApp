@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">WeatherApp</string>
     <string name="no_connection">отсутствует интернет</string>
+    <string name="text_no_internet">Данные устарели, отсутствует интернет</string>
+    <string name="city_no_select">Город не выбран</string>
+    <string name="tv_humidity_title_text">Влажность</string>
+    <string name="tv_pressure_title_text">Давление</string>
+    <string name="tv_wind_title_text">Скорость ветра</string>
 </resources>

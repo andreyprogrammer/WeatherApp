@@ -5,14 +5,12 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.andreymerkurev.weatherapp.model.entity.City;
-
 import java.util.List;
 
 import io.reactivex.Single;
 
 @Dao
-public interface ICityCachDao {
+public interface IWeatherCachDao {
     @Query("SELECT * FROM table_weathers WHERE cityName LIKE :city LIMIT 1")
     Single<WeatherCach> getWeather(String city);
 

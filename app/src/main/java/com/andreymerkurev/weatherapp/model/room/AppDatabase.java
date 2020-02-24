@@ -5,5 +5,5 @@ import androidx.room.RoomDatabase;
 
 @Database(entities = {WeatherCach.class, CityCache.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract ICityCachDao iCityCashDao();
+    public abstract IWeatherCachDao iCityCashDao();
 }

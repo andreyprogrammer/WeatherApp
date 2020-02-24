@@ -46,14 +46,11 @@ public class WeatherPresenter extends MvpPresenter<IWeatherView> {
         Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(weatherResp -> {
             putWeatherData(cityName, weatherResp.data);
             getViewState().progressBarSetVisibility(View.INVISIBLE);
-            getViewState().setDescriptions(weatherResp.data);
+            getViewState().setDescriptions(weatherResp.data, false);
 
-        }, throwable -> { //TODO нужен пустой лист
+        }, throwable -> {
             getViewState().progressBarSetVisibility(View.INVISIBLE);
             getWeatherFromDB(cityName);
-//            CurrentCondition currentCondition = new CurrentCondition();
-//            currentCondition.request.add(0,new Request());
-//            getViewState().setDescriptions(currentCondition);
             Log.e(TAG, "onError " + throwable);
         });
     }
@@ -82,6 +79,23 @@ public class WeatherPresenter extends MvpPresenter<IWeatherView> {
 
     private void getWeatherFromDB(String cityName) {
         getViewState().progressBarSetVisibility(View.VISIBLE);
+        CurrentCondition curCond = initEmptyCurrentCondition();
+        Disposable disposable = appDatabase
+                .iCityCashDao()
+                .getWeather(cityName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(weatherCach -> {
+                    weatherCachToCurrentCondition(weatherCach, curCond);
+                    getViewState().progressBarSetVisibility(View.INVISIBLE);
+                    getViewState().setDescriptions(curCond, true);
+                }, throwable -> {
+                    Log.d(TAG, "getWeatherFromDB: не удалось установить соединение");
+                    getViewState().showNoConnection();
+                });
+    }
+
+    private CurrentCondition initEmptyCurrentCondition() {
         CurrentCondition curCond = new CurrentCondition();
         curCond.request = new ArrayList<>();
         curCond.currentCondition = new ArrayList<>();
@@ -91,24 +105,17 @@ public class WeatherPresenter extends MvpPresenter<IWeatherView> {
         curCond.currentCondition.get(0).weatherIconUrl = new ArrayList<>();
         curCond.currentCondition.get(0).lang.add(new LangWeather());
         curCond.currentCondition.get(0).weatherIconUrl.add(new WeatherIconUrl());
-        Disposable disposable = appDatabase
-                .iCityCashDao()
-                .getWeather(cityName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(weatherCach -> {
-                    curCond.request.get(0).query = weatherCach.cityName;
-                    curCond.currentCondition.get(0).temp = weatherCach.temp;
-                    curCond.currentCondition.get(0).lang.get(0).value = weatherCach.weather;
-                    curCond.currentCondition.get(0).weatherIconUrl.get(0).value = weatherCach.weatherIconUrl;
-                    curCond.currentCondition.get(0).humidity = weatherCach.humidity;
-                    curCond.currentCondition.get(0).pressure = weatherCach.pressure;
-                    curCond.currentCondition.get(0).windspeed = weatherCach.windspeed;
-                    getViewState().progressBarSetVisibility(View.INVISIBLE);
-                    getViewState().setDescriptions(curCond);
-                }, throwable -> {
-                    Log.d(TAG, "getWeatherFromDB: не удалось");
-                });
+        return curCond;
+    }
+
+    private void weatherCachToCurrentCondition(WeatherCach weatherCach, CurrentCondition curCond) {
+        curCond.request.get(0).query = weatherCach.cityName;
+        curCond.currentCondition.get(0).temp = weatherCach.temp;
+        curCond.currentCondition.get(0).lang.get(0).value = weatherCach.weather;
+        curCond.currentCondition.get(0).weatherIconUrl.get(0).value = weatherCach.weatherIconUrl;
+        curCond.currentCondition.get(0).humidity = weatherCach.humidity;
+        curCond.currentCondition.get(0).pressure = weatherCach.pressure;
+        curCond.currentCondition.get(0).windspeed = weatherCach.windspeed;
     }
 
 }

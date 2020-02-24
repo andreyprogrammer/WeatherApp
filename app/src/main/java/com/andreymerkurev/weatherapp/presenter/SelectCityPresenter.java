@@ -56,11 +56,10 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
             putCityData(resultCities);
             getViewState().progressBarSetVisibility(View.INVISIBLE);
             getViewState().updateRecyclerView();
-        }, throwable -> { //TODO нужен пустой лист
+        }, throwable -> {
             getViewState().progressBarSetVisibility(View.INVISIBLE);
             getCitiesFromDB(cityName);
-            Log.e(TAG, "onError ----- no connection ------" + throwable);
-
+            Log.e(TAG, "onError ----- no connection -----" + throwable);
         });
     }
 
@@ -105,17 +104,11 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
                         resultCities.add(i, new City(areaNames, country));
                         i++;
                     }
-                    Log.d(TAG, "getCitiesFromDB: что-то удалось ---------");
-                    if (resultCities.size() == 0) {
-//TODO
-                    }
                     getViewState().updateRecyclerView();
                     getViewState().progressBarSetVisibility(View.INVISIBLE);
                 }, throwable -> {
-                    Log.d(TAG, "getWeatherFromDB: не удалось");
+                    Log.d(TAG, "getWeatherFromDB: not ok");
                     getViewState().progressBarSetVisibility(View.INVISIBLE);
-                    //TODO нет интернет соединения, нет сохраненных данных
-
                 });
     }
 
@@ -138,7 +131,7 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
 
         @Override
         public void onClick(View v, int position) {
-            if (v != null && resultCities != null )
+            if (v != null && resultCities != null)
                 getViewState().onClick(v, resultCities.get(position).areaName.get(0).value);
             else
                 Log.d(TAG, "onClick: error");

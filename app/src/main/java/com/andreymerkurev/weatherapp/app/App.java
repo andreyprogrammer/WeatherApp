@@ -1,7 +1,9 @@
 package com.andreymerkurev.weatherapp.app;
 
 import android.app.Application;
+
 import androidx.room.Room;
+
 import com.andreymerkurev.weatherapp.model.room.AppDatabase;
 
 public class App extends Application {

@@ -1,10 +1,13 @@
 package com.andreymerkurev.weatherapp.app;
 
 import android.app.Application;
-import javax.inject.Singleton;
+
 import com.andreymerkurev.weatherapp.model.PicassoLoader;
 import com.andreymerkurev.weatherapp.model.retrofit.ApiHelper;
 import com.andreymerkurev.weatherapp.model.room.AppDatabase;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 

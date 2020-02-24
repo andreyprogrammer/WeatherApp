@@ -8,10 +8,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface IApiService {
-//    @GET("premium/v1/search.ashx")
-//    Observable<List<City>> getCities(@Query("query") String query,
-//                                     @Query("format") String format,
-//                                     @Query("key") String key);
 
     @GET("premium/v1/search.ashx")
     Observable<RequestResultSearch> getCities(@Query("query") String query,

@@ -1,23 +1,19 @@
 package com.andreymerkurev.weatherapp.view;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-import javax.inject.Inject;
+
 import com.andreymerkurev.weatherapp.R;
 import com.andreymerkurev.weatherapp.app.App;
-import com.andreymerkurev.weatherapp.model.PicassoLoader;
 import com.andreymerkurev.weatherapp.presenter.IRecyclerSelectCityPresenter;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.InnerViewHolder>{
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.InnerViewHolder> {
     private IRecyclerSelectCityPresenter iRecyclerSelectCityPresenter;
 
     RecyclerAdapter(IRecyclerSelectCityPresenter iRecyclerSelectCityPresenter) {
@@ -47,19 +43,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.InnerV
         private TextView tvName;
         private TextView tvCountry;
         private CardView cardView;
-//        private TextView tvTemp;
         private int position = 0;
 
         InnerViewHolder(@NonNull View itemView) {
             super(itemView);
-//            imageView = itemView.findViewById(R.id.iv);
             tvName = itemView.findViewById(R.id.card_item_name);
             tvCountry = itemView.findViewById(R.id.card_item_country);
             cardView = itemView.findViewById(R.id.card_view);
             cardView.setOnClickListener(v ->
                     iRecyclerSelectCityPresenter.onClick(v, position)
             );
-            }
+        }
 
         @Override
         public int getPos() {

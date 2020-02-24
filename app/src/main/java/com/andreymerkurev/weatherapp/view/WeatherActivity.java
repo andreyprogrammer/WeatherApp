@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,7 +24,6 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
 public class WeatherActivity extends MvpAppCompatActivity implements IWeatherView {
-    private Toolbar toolbar;
     private ProgressBar progressBar;
     private TextView tvCityName;
     private TextView tvTemp;
@@ -32,6 +32,7 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
     private TextView tvHumidity;
     private TextView tvPressure;
     private TextView tvWind;
+    private TextView tvNoConnection;
 
     @InjectPresenter
     WeatherPresenter weatherPresenter;
@@ -51,10 +52,11 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
         App.getAppComponent().inject(this);
         initViews();
         String cityName = getIntent().getStringExtra("CITY_NAME");
+        assert cityName != null;
         if (cityName.length() != 0) {
             weatherPresenter.getWeatherFromInternet(cityName);
         } else {
-                tvCityName.setText(R.string.no_connection);
+            tvCityName.setText(R.string.no_connection);
         }
     }
 
@@ -66,7 +68,7 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
     }
 
     void initViews() {
-        toolbar = findViewById(R.id.toolbar_main);
+        Toolbar toolbar = findViewById(R.id.toolbar_main);
         progressBar = findViewById(R.id.pb_main);
         setSupportActionBar(toolbar);
         tvCityName = findViewById(R.id.tv_city_name);
@@ -76,13 +78,12 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
         tvHumidity = findViewById(R.id.tv_humidity);
         tvPressure = findViewById(R.id.tv_pressure);
         tvWind = findViewById(R.id.tv_wind);
+        tvNoConnection = findViewById(R.id.tv_no_connection);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_search) {
-//            Intent intent = new Intent(this, SelectCityActivity.class);
-//            startActivity(intent);
+        if (item.getItemId() == R.id.action_search) {
             onBackPressed();
         }
         return true;
@@ -94,7 +95,7 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
     }
 
     @Override
-    public void setDescriptions(CurrentCondition currentCondition) {
+    public void setDescriptions(CurrentCondition currentCondition, Boolean isDataFromDB) {
         tvCityName.setText(currentCondition.request.get(0).query);
         tvTemp.setText(currentCondition.currentCondition.get(0).temp);
         tvWeather.setText(currentCondition.currentCondition.get(0).lang.get(0).value);
@@ -102,9 +103,18 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
         tvPressure.setText(currentCondition.currentCondition.get(0).pressure);
         tvWind.setText(currentCondition.currentCondition.get(0).windspeed);
         setImage(currentCondition.currentCondition.get(0).weatherIconUrl.get(0).value, imageView);
+        if (isDataFromDB) {
+            tvNoConnection.setVisibility(View.VISIBLE);
+        } else
+            tvNoConnection.setVisibility(View.INVISIBLE);
     }
 
     public void setImage(String url, ImageView imageView) {
         picassoLoader.loadImage(url, imageView);
+    }
+
+    @Override
+    public void showNoConnection() {
+        tvCityName.setText(R.string.no_connection);
     }
 }

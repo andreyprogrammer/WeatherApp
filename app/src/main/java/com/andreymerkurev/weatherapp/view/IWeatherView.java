@@ -9,8 +9,7 @@ import moxy.viewstate.strategy.StateStrategyType;
 
 @StateStrategyType(value = SkipStrategy.class)
 public interface IWeatherView extends MvpView {
-//    void updateRecyclerView();
-//    void onClick(View v, int position, List<City> hitList);
     void progressBarSetVisibility(int visibility);
-    void setDescriptions(CurrentCondition currentCondition);
+    void setDescriptions(CurrentCondition currentCondition, Boolean isDataFromDB);
+    void showNoConnection();
 }
