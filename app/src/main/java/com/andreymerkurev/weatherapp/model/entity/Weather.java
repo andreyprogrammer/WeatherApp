@@ -2,6 +2,7 @@ package com.andreymerkurev.weatherapp.model.entity;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class Weather {
@@ -28,6 +29,4 @@ public class Weather {
     @Expose
     @SerializedName("pressure")
     public String pressure;
-
-
 }

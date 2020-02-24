@@ -7,4 +7,8 @@ public class AreaName {
     @Expose
     @SerializedName("value")
     public String value;
+
+    public AreaName(String value) {
+        this.value = value;
+    }
 }

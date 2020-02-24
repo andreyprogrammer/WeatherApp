@@ -1,6 +1,5 @@
 package com.andreymerkurev.weatherapp.view;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +14,6 @@ import com.andreymerkurev.weatherapp.R;
 import com.andreymerkurev.weatherapp.app.App;
 import com.andreymerkurev.weatherapp.model.PicassoLoader;
 import com.andreymerkurev.weatherapp.model.entity.CurrentCondition;
-import com.andreymerkurev.weatherapp.model.entity.Weather;
 import com.andreymerkurev.weatherapp.presenter.WeatherPresenter;
 
 import javax.inject.Inject;
@@ -53,7 +51,11 @@ public class WeatherActivity extends MvpAppCompatActivity implements IWeatherVie
         App.getAppComponent().inject(this);
         initViews();
         String cityName = getIntent().getStringExtra("CITY_NAME");
-        weatherPresenter.getWeatherFromInternet(cityName);
+        if (cityName.length() != 0) {
+            weatherPresenter.getWeatherFromInternet(cityName);
+        } else {
+                tvCityName.setText(R.string.no_connection);
+        }
     }
 
     @Override

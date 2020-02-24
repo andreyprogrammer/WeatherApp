@@ -15,10 +15,15 @@ public class City {
     public List<Country> country;
 
     @Expose
-    @SerializedName("latitude")
+    @SerializedName("latitude") //TODO delete
     public String latitude;
 
     @Expose
     @SerializedName("longitude")
     public String longitude;
+
+    public City(List<AreaName> areaName, List<Country> country) {
+        this.areaName = areaName;
+        this.country = country;
+    }
 }

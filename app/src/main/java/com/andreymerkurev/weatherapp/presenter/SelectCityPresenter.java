@@ -4,12 +4,18 @@ import android.util.Log;
 import android.view.View;
 
 import com.andreymerkurev.weatherapp.app.App;
+import com.andreymerkurev.weatherapp.model.entity.AreaName;
 import com.andreymerkurev.weatherapp.model.entity.City;
+import com.andreymerkurev.weatherapp.model.entity.Country;
+import com.andreymerkurev.weatherapp.model.entity.CurrentCondition;
 import com.andreymerkurev.weatherapp.model.entity.RequestResultSearch;
 import com.andreymerkurev.weatherapp.model.retrofit.ApiHelper;
+import com.andreymerkurev.weatherapp.model.room.AppDatabase;
+import com.andreymerkurev.weatherapp.model.room.CityCache;
 import com.andreymerkurev.weatherapp.view.ISelectCityView;
 import com.andreymerkurev.weatherapp.view.IViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,6 +23,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
@@ -28,6 +35,9 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
 
     @Inject
     ApiHelper apiHelper;
+
+    @Inject
+    AppDatabase appDatabase;
 
     public SelectCityPresenter() {
         App.getAppComponent().inject(this);
@@ -42,45 +52,72 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
         getViewState().progressBarSetVisibility(View.VISIBLE);
         Observable<RequestResultSearch> single = apiHelper.requestServer(cityName);
         Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
-
-            for (City city : cities.searchApi.result) {
-//                putData(hit.webformatURL);
-                Log.d(TAG, "onNext: city.areaName: " + city.areaName.get(0).value +
-                        " --- city.country:" + city.country.get(0).value +
-                        " lat: " + city.latitude + " lon: " + city.longitude);
-            }
             resultCities = cities.searchApi.result;
+            putCityData(resultCities);
             getViewState().progressBarSetVisibility(View.INVISIBLE);
             getViewState().updateRecyclerView();
         }, throwable -> { //TODO нужен пустой лист
             getViewState().progressBarSetVisibility(View.INVISIBLE);
-            Log.e(TAG, "onError " + throwable);
+            getCitiesFromDB(cityName);
+            Log.e(TAG, "onError ----- no connection ------" + throwable);
+
         });
     }
 
-//    public void getAllCitiesFromInternet2() {
-//        getViewState().progressBarSetVisibility(View.VISIBLE);
-//        Observable<RequestResultSearch> single = apiHelper.requestServer2();
-//        Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
-////            Log.d(TAG, "onNext1: " + cities);
-////            Log.d(TAG, "onNext2: " + cities.searchApi);
-////            Log.d(TAG, "onNext3 size: " + cities.searchApi.result.size());
-////            Log.d(TAG, "onNext4: " + cities.searchApi.result.get(0).country);
-//
-//            for (City city : cities.searchApi.result) {
-////                putData(hit.webformatURL);
-//                Log.d(TAG, "onNext: city.areaName: " + city.areaName.get(0).value +
-//                        " --- city.country:" + city.country.get(0).value +
-//                        " lat: " + city.latitude + " lon: " + city.longitude);
-//            }
-//            resultCities = cities.searchApi.result;
-//            getViewState().progressBarSetVisibility(View.INVISIBLE);
-//            getViewState().updateRecyclerView();
-//        }, throwable -> {
-//            Log.e(TAG, "onError " + throwable);
-//        });
-//    }
+    private void putCityData(List<City> listResultCities) {
+        List<CityCache> listCityCache = new ArrayList<>();
+        int i = 0;
+        for (City city : listResultCities) {
+            listCityCache.add(i, new CityCache(city.areaName.get(0).value,
+                    city.country.get(0).value));
+            i++;
+        }
 
+        Disposable disposable = appDatabase
+                .iCityCashDao()
+                .insertCities(listCityCache)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(id -> {
+                    Log.d(TAG, "putData: " + id);
+                }, throwable -> {
+                    Log.d(TAG, "putData: " + throwable);
+                });
+    }
+
+    private void getCitiesFromDB(String cityName) {
+        getViewState().progressBarSetVisibility(View.VISIBLE);
+        CurrentCondition curCond = new CurrentCondition();
+        Disposable disposable = appDatabase
+                .iCityCashDao()
+                .getCities(cityName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listCitiesCash -> {
+                    int i = 0;
+                    if (resultCities != null) resultCities.clear();
+                    List<AreaName> areaNames = new ArrayList<>();
+                    List<Country> country = new ArrayList<>();
+                    if (resultCities == null) resultCities = new ArrayList<>();
+                    for (CityCache cityCache : listCitiesCash) {
+                        areaNames.add(0, new AreaName(cityCache.cityName));
+                        country.add(0, new Country(cityCache.country));
+                        resultCities.add(i, new City(areaNames, country));
+                        i++;
+                    }
+                    Log.d(TAG, "getCitiesFromDB: что-то удалось ---------");
+                    if (resultCities.size() == 0) {
+//TODO
+                    }
+                    getViewState().updateRecyclerView();
+                    getViewState().progressBarSetVisibility(View.INVISIBLE);
+                }, throwable -> {
+                    Log.d(TAG, "getWeatherFromDB: не удалось");
+                    getViewState().progressBarSetVisibility(View.INVISIBLE);
+                    //TODO нет интернет соединения, нет сохраненных данных
+
+                });
+    }
 
     private class RecyclerSelectCityPresenter implements IRecyclerSelectCityPresenter {
         @Override
@@ -101,7 +138,10 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
 
         @Override
         public void onClick(View v, int position) {
-            getViewState().onClick(v, resultCities.get(position).areaName.get(0).value);
+            if (v != null && resultCities != null )
+                getViewState().onClick(v, resultCities.get(position).areaName.get(0).value);
+            else
+                Log.d(TAG, "onClick: error");
         }
     }
 

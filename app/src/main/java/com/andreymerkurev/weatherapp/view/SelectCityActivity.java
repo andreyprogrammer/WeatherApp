@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,6 +52,7 @@ public class SelectCityActivity extends MvpAppCompatActivity implements ISelectC
         btn.setOnClickListener(v -> {
 //            Log.d(TAG, "entry act");
 //            selectCityPresenter.getAllCitiesFromInternet(); //TODO проверка на пустое поле
+
             selectCityPresenter.getAllCitiesFromInternet(editText.getText().toString());
 
         });
@@ -79,9 +81,10 @@ public class SelectCityActivity extends MvpAppCompatActivity implements ISelectC
 
     @Override
     public void onClick(View v, String cityName) {
-        Intent intent = new Intent(v.getContext(), WeatherActivity.class);
-        intent.putExtra("CITY_NAME", cityName);
-        startActivity(intent);
+        editText.setText("");
+            Intent intent = new Intent(v.getContext(), WeatherActivity.class);
+            intent.putExtra("CITY_NAME", cityName);
+            startActivity(intent);
     }
 
     @Override
