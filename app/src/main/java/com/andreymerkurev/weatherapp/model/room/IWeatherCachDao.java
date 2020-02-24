@@ -17,7 +17,7 @@ public interface IWeatherCachDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Single<Long> insertWeather(WeatherCach weatherCach);
 
-    @Query("SELECT * FROM table_cities WHERE cityName LIKE :city")
+    @Query("SELECT * FROM table_cities WHERE cityName LIKE :city LIMIT 1")
     Single<List<CityCache>> getCities(String city);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
