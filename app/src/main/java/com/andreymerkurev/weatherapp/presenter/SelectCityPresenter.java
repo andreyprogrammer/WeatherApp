@@ -7,7 +7,6 @@ import com.andreymerkurev.weatherapp.app.App;
 import com.andreymerkurev.weatherapp.model.entity.AreaName;
 import com.andreymerkurev.weatherapp.model.entity.City;
 import com.andreymerkurev.weatherapp.model.entity.Country;
-import com.andreymerkurev.weatherapp.model.entity.CurrentCondition;
 import com.andreymerkurev.weatherapp.model.entity.RequestResultSearch;
 import com.andreymerkurev.weatherapp.model.retrofit.ApiHelper;
 import com.andreymerkurev.weatherapp.model.room.AppDatabase;
@@ -86,7 +85,6 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
 
     private void getCitiesFromDB(String cityName) {
         getViewState().progressBarSetVisibility(View.VISIBLE);
-        CurrentCondition curCond = new CurrentCondition();
         Disposable disposable = appDatabase
                 .iCityCashDao()
                 .getCities(cityName)
@@ -95,9 +93,9 @@ public class SelectCityPresenter extends MvpPresenter<ISelectCityView> {
                 .subscribe(listCitiesCash -> {
                     int i = 0;
                     if (resultCities != null) resultCities.clear();
+                        else resultCities = new ArrayList<>();
                     List<AreaName> areaNames = new ArrayList<>();
                     List<Country> country = new ArrayList<>();
-                    if (resultCities == null) resultCities = new ArrayList<>();
                     for (CityCache cityCache : listCitiesCash) {
                         areaNames.add(0, new AreaName(cityCache.cityName));
                         country.add(0, new Country(cityCache.country));
